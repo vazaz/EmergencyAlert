@@ -62,6 +62,7 @@ public class LocationAddress {
         for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
             sb.append(address.getAddressLine(i)).append("\n");
         }
+        Log.e("address", sb.toString());
         return sb.toString();
     }
 }

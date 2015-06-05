@@ -1,6 +1,7 @@
 package com.vasyl.emergencyalert.dialogs;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.Ringtone;
@@ -20,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import com.vasyl.emergencyalert.R;
 import com.vasyl.emergencyalert.adapters.ContactAdapter;
 import com.vasyl.emergencyalert.models.Contact;
+import com.vasyl.emergencyalert.utils.SmsSender;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -53,8 +55,7 @@ public class InfoScreenDialog extends DialogFragment {
 
     private void init() {
         sharedPrefs = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), getActivity().getApplicationContext()
-                        .MODE_PRIVATE);
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         inflater = getActivity().getLayoutInflater();
         view = inflater.inflate(R.layout.dialog_alert, null);
         profile = (TextView) view.findViewById(R.id.alert_dialog_profile);
@@ -62,8 +63,7 @@ public class InfoScreenDialog extends DialogFragment {
         callTo = (TextView) view.findViewById(R.id.alert_dialog_first);
         contactListView = (ListView) view.findViewById(R.id.dialog_contact_list);
         contacts = getSmsContacts();
-        adapter = new ContactAdapter(getActivity().getApplicationContext(),R.layout
-                .single_contact, contacts);
+        adapter = new ContactAdapter(getActivity().getApplicationContext(), contacts);
         disease = sharedPrefs.getString(getString(R.string.disease), "");
         name = sharedPrefs.getString(getString(R.string.name), "");
         surname = sharedPrefs.getString(getString(R.string.surname), "");
@@ -71,6 +71,8 @@ public class InfoScreenDialog extends DialogFragment {
         medicine.setText("I have " + disease);
         callTo.setText("You can call to");
         contactListView.setAdapter(adapter);
+        new SmsSender(getActivity().getApplicationContext(), getPhones(contacts))
+                .sendSmsWithLocation();
     }
 
     private void playAlarm() {
@@ -99,11 +101,23 @@ public class InfoScreenDialog extends DialogFragment {
         return builder;
     }
 
-    private List<Contact> getSmsContacts(){
+    private List<Contact> getSmsContacts() {
         String contactsString = sharedPrefs.getString(getString(R.string.contacts), "");
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<Contact>>(){}.getType();
+        Type type = new TypeToken<ArrayList<Contact>>() {
+        }.getType();
         return gson.fromJson(contactsString, type);
     }
 
+
+    private List<String> getPhones(List<Contact> contacts) {
+        List<String> phones = new ArrayList<>();
+        if (contacts != null) {
+            for (Contact item : contacts) {
+                phones.add(item.getPhone());
+            }
+        }
+        Log.e("TAG", phones.toString());
+        return phones;
+    }
 }

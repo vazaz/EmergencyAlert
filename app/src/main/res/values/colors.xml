@@ -5,4 +5,6 @@
     <color name="background">#FFFFFF</color>
     <color name="secondary_dark">#0091EA</color>
     <color name="secondary">#80D8FF</color>
+    <color name="indicator">#3fc1a0</color>
+    <color name="startButtonRaisedBackground">#fc5f61</color>
 </resources>

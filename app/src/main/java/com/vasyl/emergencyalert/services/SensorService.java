@@ -9,40 +9,30 @@ import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.vasyl.emergencyalert.views.FallDetectionDialogActivity;
 
-import java.util.ArrayList;
-
 public class SensorService extends Service implements SensorEventListener {
 
-
-    public static final double FREE_fALL = 9.8;
-    public static final double SIGMA = 0.5;
-    public static final double HIGH_THRESHOLD = 10;
-    public static final double MIDDLE_THRESHOLD = 5;
-    public static final double LOW_THRESHOLD = 2.5;
-    public static final int BUFF_SIZE = 50;
-    public static final String NONE = "none";
-    public static final String FALL = "fall";
-    public static final String WALKING = "walking";
-    public static final String SITTING = "sitting";
-    public static final String STANDING = "standing";
+    private static final double SIGMA = 0.5;
+    private static final double HIGH_THRESHOLD = 10;
+    private static final double MIDDLE_THRESHOLD = 5;
+    private static final double LOW_THRESHOLD = 2.5;
+    private static final int BUFF_SIZE = 50;
+    private static final String NONE = "none";
+    private static final String FALL = "fall";
+    private static final String WALKING = "walking";
+    private static final String SITTING = "sitting";
+    private static final String STANDING = "standing";
 
     private String currentState;
     private String previousState;
-    public double[] window;
+    private double[] window;
 
-    public double currentX;
-    public double currentY;
-    public double currentZ;
-    public double previousX;
-    public double previousY;
-    public double previousZ;
-    public Double linearAcceleration;
-
-    private SensorManager sensorManager;
+    private double currentX;
+    private double currentY;
+    private double currentZ;
+    private Double linearAcceleration;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -51,7 +41,7 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     private void init() {
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         window = new double[BUFF_SIZE];
         for (int i = 0; i < BUFF_SIZE; i++) {
@@ -59,9 +49,6 @@ public class SensorService extends Service implements SensorEventListener {
         }
         previousState = NONE;
         currentState = NONE;
-        previousX = FREE_fALL;
-        previousY = FREE_fALL;
-        previousZ = FREE_fALL;
 
         HandlerThread handlerThread = new HandlerThread("SensorHandlerThread");
         handlerThread.start();

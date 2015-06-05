@@ -20,9 +20,9 @@ import java.util.List;
 
 public class SmsSender {
 
-    private Context mContext;
-    private GpsService appLocationService;
-    private List<String> phones;
+    Context mContext;
+    GpsService appLocationService;
+    List<String> phones;
 
     public SmsSender(Context mContext, List<String> phones) {
         this.mContext = mContext;
