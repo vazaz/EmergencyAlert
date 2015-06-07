@@ -2,6 +2,7 @@ package com.vasyl.emergencyalert.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.vasyl.emergencyalert.R;
 import com.vasyl.emergencyalert.models.Contact;
 
@@ -27,39 +29,41 @@ public class ContactAdapter extends BaseAdapter implements Filterable {
 
     private Context context;
     private List<Contact> contacts;
-    private List<Contact> filteredContacts = new ArrayList<>();
+    private List<Contact> filteredContacts;
     private ContactFilter filter;
     private LayoutInflater mInflater;
 
     public ContactAdapter(Context context, List<Contact> contacts) {
         this.context = context;
         this.contacts = contacts;
+        filteredContacts = contacts;
     }
 
     public void removeDuplicates() {
         Set<Contact> set = new HashSet<>();
-        set.addAll(contacts);
-        contacts.clear();
-        contacts.addAll(set);
+        set.addAll(filteredContacts);
+        filteredContacts.clear();
+        filteredContacts.addAll(set);
+        notifyDataSetChanged();
     }
 
     public void remove(int position) {
-        contacts.remove(position);
+        filteredContacts.remove(position);
     }
 
     public void add(Contact contact) {
-        contacts.add(contact);
+        filteredContacts.add(contact);
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return contacts.size();
+        return filteredContacts.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return contacts.get(position);
+        return filteredContacts.get(position);
     }
 
     @Override
@@ -90,10 +94,25 @@ public class ContactAdapter extends BaseAdapter implements Filterable {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Contact item = contacts.get(position);
+        Contact item = filteredContacts.get(position);
         viewHolder.name.setText(item.getName());
         viewHolder.phone.setText(item.getPhone());
+        TextDrawable drawable = getTextDrawable(item.getName());
+        viewHolder.avatar.setImageDrawable(drawable);
+
         return convertView;
+    }
+
+    private TextDrawable getTextDrawable(String name) {
+        String[] words = name.split("\\s+");
+        String initials;
+        if (words.length > 1) {
+            initials = words[0].substring(0, 1) + words[1].substring(0, 1);
+        } else {
+            initials = words[0].substring(0, 1);
+        }
+        return TextDrawable.builder().beginConfig().textColor(Color.WHITE).endConfig()
+                .buildRound(initials, Color.rgb(252, 95, 97));
     }
 
     private static class ViewHolder {
@@ -123,18 +142,19 @@ public class ContactAdapter extends BaseAdapter implements Filterable {
             }
 
             results.values = nlist;
-            Log.e("results values", results.values.toString());
             results.count = nlist.size();
-
             return results;
         }
 
         @Override
         @SuppressWarnings("unchecked")
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-//                Log.e("results values", charSequence.toString());
-            filteredContacts = (ArrayList<Contact>) filterResults.values;
-            notifyDataSetChanged();
+            if (filterResults.values != null) {
+                filteredContacts = (ArrayList<Contact>) filterResults.values;
+                notifyDataSetChanged();
+            } else {
+                notifyDataSetInvalidated();
+            }
         }
     }
 }

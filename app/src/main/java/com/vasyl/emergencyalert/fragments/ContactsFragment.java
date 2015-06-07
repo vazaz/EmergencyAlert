@@ -1,15 +1,8 @@
-package com.vasyl.emergencyalert.views;
+package com.vasyl.emergencyalert.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,18 +17,13 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.hudomju.swipe.SwipeToDismissTouchListener;
-import com.hudomju.swipe.adapter.ListViewAdapter;
 import com.vasyl.emergencyalert.R;
 import com.vasyl.emergencyalert.adapters.ContactAdapter;
 import com.vasyl.emergencyalert.models.Contact;
 import com.vasyl.emergencyalert.services.SensorService;
+import com.vasyl.emergencyalert.utils.MyContactsManager;
 import com.vasyl.emergencyalert.utils.SwipeDismissListViewTouchListener;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,11 +35,12 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
     private AutoCompleteTextView autoCompleteTextView;
     private Button startButton;
 
-    private ContactAdapter smsContactsAdapter;
+    private ContactAdapter listAdapter;
 
     private List<Contact> smsContactsList;
-    private SharedPreferences sharedPrefs;
     private Gson gson;
+    private ContactAdapter autoCompleteTextViewAdapter;
+    private MyContactsManager myContactsManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,8 +51,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void init() {
-        sharedPrefs = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        myContactsManager = new MyContactsManager(getActivity().getApplicationContext());
 
         autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.add_contact);
         listView = (ListView) view.findViewById(R.id.listview);
@@ -71,16 +59,10 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
 
         gson = new Gson();
         startButton.setEnabled(false);
+        List<Contact> allContactsList = myContactsManager.getAllContactsList(view);
         smsContactsList = getSmsContactsList();
-        List<Contact> allContactsList = getAllContactsList(view);
-
-        final ContactAdapter autoCompleteTextViewAdapter = getContactAdapter(allContactsList);
-        smsContactsAdapter = getContactAdapter(smsContactsList);
-
-        autoCompleteTextView.setAdapter(autoCompleteTextViewAdapter);
-        listView.setAdapter(smsContactsAdapter);
+        autoCompleteTextViewAdapter = getContactAdapter(allContactsList);
         autoCompleteTextView.setOnItemClickListener(this);
-        startButton.setOnClickListener(this);
         autoCompleteTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -96,6 +78,11 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
             }
         });
 
+        autoCompleteTextView.setAdapter(autoCompleteTextViewAdapter);
+        listAdapter = getContactAdapter(smsContactsList);
+        listView.setAdapter(listAdapter);
+        Log.e("listAdapter on start", String.valueOf(listAdapter.getCount()));
+
         SwipeDismissListViewTouchListener touchListener =
                 new SwipeDismissListViewTouchListener(
                         listView,
@@ -108,20 +95,19 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
                             @Override
                             public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                 for (int position : reverseSortedPositions) {
-                                    smsContactsAdapter.remove(position);
+                                    listAdapter.remove(position);
                                 }
-                                smsContactsAdapter.notifyDataSetChanged();
+                                listAdapter.notifyDataSetChanged();
                             }
                         });
         listView.setOnTouchListener(touchListener);
-        // Setting this scroll listener is required to ensure that during ListView scrolling,
-        // we don't look for swipes.
         listView.setOnScrollListener(touchListener.makeScrollListener());
+        startButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        saveSmsContacts(smsContactsList);
+        myContactsManager.saveSmsContacts(smsContactsList);
         startIntent();
     }
 
@@ -134,8 +120,8 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Contact contact = (Contact) autoCompleteTextView.getAdapter().getItem(position);
-        smsContactsAdapter.add(contact);
-        smsContactsAdapter.removeDuplicates();
+        listAdapter.add(contact);
+        listAdapter.removeDuplicates();
         InputMethodManager inputManager = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -149,67 +135,12 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
         return new ContactAdapter(getActivity().getApplicationContext(), list);
     }
 
-    private ArrayList<Contact> getAllContactsList(View view) {
-        ArrayList<Contact> contactList = new ArrayList<>();
-        try {
-            Cursor people = view.getContext().getContentResolver()
-                    .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-            if (people != null) {
-                while (people.moveToNext()) {
-                    Contact contact = new Contact();
-//                    String image_uri = people
-//                            .getString(people.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-//                    contact.setAvatar(MediaStore.Images.Media
-//                            .getBitmap(getActivity().getApplicationContext().getContentResolver(),
-//                                    Uri.parse(image_uri)));
-                    contact.setName(people.getString(people.getColumnIndex(ContactsContract
-                            .CommonDataKinds
-                            .Phone.DISPLAY_NAME)));
-                    contact.setPhone(people.getString(people.getColumnIndex(ContactsContract
-                            .CommonDataKinds
-                            .Phone.NUMBER)));
-                    contactList.add(contact);
-                }
-            }
-            assert people != null;
-            people.close();
-        } catch (NullPointerException e) {
-            Log.e("getAllContactsList()", e.getMessage());
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-        }
-        return contactList;
-    }
-
-    private void saveSmsContacts(List<Contact> contacts) {
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        String jsonContacts = gson.toJson(contacts);
-        editor.putString(getString(R.string.contacts), jsonContacts);
-        editor.apply();
-    }
-
-    private List<Contact> getSmsContacts() {
-        String contactsString = sharedPrefs.getString(getString(R.string.contacts), "");
-        gson = new Gson();
-        Type type = new TypeToken<ArrayList<Contact>>() {
-        }.getType();
-        return gson.fromJson(contactsString, type);
-    }
-
     private List<Contact> getSmsContactsList() {
-        if (sharedPrefs.contains(getString(R.string.contacts))) {
+        if (myContactsManager.getSharedPrefs().contains(getString(R.string.contacts))) {
             startButton.setEnabled(true);
-            return getSmsContacts();
+            return myContactsManager.getSmsContacts();
         } else {
             return new ArrayList<>();
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveSmsContacts(smsContactsList);
     }
 }

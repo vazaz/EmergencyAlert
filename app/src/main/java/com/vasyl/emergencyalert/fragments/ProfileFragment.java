@@ -1,4 +1,4 @@
-package com.vasyl.emergencyalert.views;
+package com.vasyl.emergencyalert.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;

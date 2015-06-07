@@ -4,9 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.vasyl.emergencyalert.views.ContactsFragment;
-import com.vasyl.emergencyalert.views.MedicineFragment;
-import com.vasyl.emergencyalert.views.ProfileFragment;
+import com.vasyl.emergencyalert.fragments.ContactsFragment;
+import com.vasyl.emergencyalert.fragments.MedicineFragment;
+import com.vasyl.emergencyalert.fragments.ProfileFragment;
 
 /**
  * Created by vasyl on 5/19/15.

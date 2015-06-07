@@ -1,23 +1,15 @@
 package com.vasyl.emergencyalert.models;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 
 /**
  * Created by vasyl on 5/24/15.
  */
 public class Contact {
 
-    private Bitmap avatar;
     private String name;
     private String phone;
-
-    public Bitmap getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(Bitmap avatar) {
-        this.avatar = avatar;
-    }
 
     public String getName() {
         return name;

@@ -22,45 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * A {@link View.OnTouchListener} that makes the list items in a {@link ListView}
- * dismissable. {@link ListView} is given special treatment because by default it handles touches
- * for its list items... i.e. it's in charge of drawing the pressed state (the list selector),
- * handling list item clicks, etc.
- *
- * <p>After creating the listener, the caller should also call
- * {@link ListView#setOnScrollListener(AbsListView.OnScrollListener)}, passing
- * in the scroll listener returned by {@link #makeScrollListener()}. If a scroll listener is
- * already assigned, the caller should still pass scroll changes through to this listener. This will
- * ensure that this {@link SwipeDismissListViewTouchListener} is paused during list view
- * scrolling.</p>
- *
- * <p>Example usage:</p>
- *
- * <pre>
- * SwipeDismissListViewTouchListener touchListener =
- *         new SwipeDismissListViewTouchListener(
- *                 listView,
- *                 new SwipeDismissListViewTouchListener.OnDismissCallback() {
- *                     public void onDismiss(ListView listView, int[] reverseSortedPositions) {
- *                         for (int position : reverseSortedPositions) {
- *                             adapter.remove(adapter.getItem(position));
- *                         }
- *                         adapter.notifyDataSetChanged();
- *                     }
- *                 });
- * listView.setOnTouchListener(touchListener);
- * listView.setOnScrollListener(touchListener.makeScrollListener());
- * </pre>
- *
- * <p>This class Requires API level 12 or later due to use of {@link
- * ViewPropertyAnimator}.</p>
- *
- * <p>For a generalized {@link View.OnTouchListener} that makes any view dismissable,
- * see {@link SwipeDismissTouchListener}.</p>
- *
- * @see SwipeDismissTouchListener
- */
 public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
     // Cached ViewConfiguration and system-wide constant values
     private int mSlop;
