@@ -50,7 +50,7 @@ public class LocationAddress {
         } else {
             message.what = 1;
             Bundle bundle = new Bundle();
-            result = "Unable to get address for this lat-long.";
+            result = "Please call me!";
             bundle.putString("address", result);
             message.setData(bundle);
         }
@@ -62,7 +62,6 @@ public class LocationAddress {
         for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
             sb.append(address.getAddressLine(i)).append("\n");
         }
-        Log.e("address", sb.toString());
         return sb.toString();
     }
 }

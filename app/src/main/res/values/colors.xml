@@ -7,4 +7,5 @@
     <color name="secondary">#80D8FF</color>
     <color name="indicator">#3fc1a0</color>
     <color name="startButtonRaisedBackground">#fc5f61</color>
+    <color name="divider">#1CFFFFFF</color>
 </resources>

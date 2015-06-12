@@ -75,4 +75,14 @@ public class MyContactsManager {
         }.getType();
         return gson.fromJson(contactsString, type);
     }
+
+    public List<String> getPhones(List<Contact> contacts) {
+        List<String> phones = new ArrayList<>();
+        if (contacts != null) {
+            for (Contact item : contacts) {
+                phones.add(item.getPhone());
+            }
+        }
+        return phones;
+    }
 }
