@@ -39,7 +39,7 @@ public class MyContactsManager {
         try {
             Cursor people = view.getContext().getContentResolver()
                     .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.RawContacts.ACCOUNT_TYPE + "= ?",
-                            new String[] { "com.google" }, null);
+                            new String[]{"com.google"}, null);
             if (people != null) {
                 while (people.moveToNext()) {
                     Contact contact = new Contact();
@@ -74,5 +74,21 @@ public class MyContactsManager {
         Type type = new TypeToken<ArrayList<Contact>>() {
         }.getType();
         return gson.fromJson(contactsString, type);
+    }
+
+    public List<String> getPhones(List<Contact> contacts) {
+        List<String> phones = new ArrayList<>();
+        if (contacts != null) {
+            for (Contact item : contacts) {
+                phones.add(item.getPhone());
+            }
+        }
+        return phones;
+    }
+
+    public String getPersonalData() {
+        String name = getSharedPrefs().getString("name", "");
+        String surName = getSharedPrefs().getString("surname", "");
+        return name + " " + surName;
     }
 }

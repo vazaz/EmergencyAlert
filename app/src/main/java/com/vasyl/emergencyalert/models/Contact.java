@@ -1,8 +1,5 @@
 package com.vasyl.emergencyalert.models;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-
 /**
  * Created by vasyl on 5/24/15.
  */

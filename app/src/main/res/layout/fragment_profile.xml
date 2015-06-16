@@ -1,22 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+
+    <TextView
+        android:id="@+id/info_name_title"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+
+        android:gravity="center_vertical"
+        android:text="@string/personal_details"
+        android:textColor="@color/indicator"
+        android:textSize="@dimen/abc_text_size_subhead_material" />
+
+    <EditText
+        android:id="@+id/name_edit_view"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/info_name_title"
+        android:gravity="center_vertical"
+        android:hint="@string/enter_name"
+        android:textSize="14dp"
+        android:imeOptions="actionDone"
+        android:singleLine="true"/>
 
     <EditText
         android:id="@+id/surname_edit_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:hint="@string/enter_surname" />
+        android:layout_height="48dp"
+        android:layout_below="@id/name_edit_view"
+        android:gravity="center_vertical"
+        android:hint="@string/enter_surname"
+        android:textSize="14dp"
+        android:imeOptions="actionDone"
+        android:singleLine="true"/>
+
+    <TextView
+        android:id="@+id/info_health_title"
+        android:layout_width="wrap_content"
+        android:paddingTop="16dp"
+        android:layout_height="48dp"
+        android:layout_below="@id/surname_edit_view"
+        android:gravity="center_vertical"
+        android:text="@string/health_details"
+        android:textColor="@color/indicator"
+        android:textSize="@dimen/abc_text_size_subhead_material" />
 
     <EditText
-            android:id="@+id/name_edit_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/surname_edit_view"
-            android:hint="@string/enter_name"/>
+        android:id="@+id/disease"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/info_health_title"
+        android:gravity="center_vertical"
+        android:hint="@string/disease"
+        android:textSize="14dp"
+        android:imeOptions="actionDone"
+        android:singleLine="true"/>
+
+    <!--<Button-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--style="@style/Widget.AppCompat.Button.Borderless"-->
+    <!--android:text="@string/start_monitor"-->
+    <!--android:textColor="@color/indicator"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--/>-->
 
 
 </RelativeLayout>
