@@ -21,7 +21,6 @@ public class PushBroadCastReceiver extends ParsePushBroadcastReceiver {
         try {
             json = new JSONObject(intent.getExtras().getString("com.parse.Data"));
             JSONObject jsonGeoPoint = json.getJSONObject("location");
-            String title = json.getString("title");
             latitude = jsonGeoPoint.getDouble("latitude");
             longitude = jsonGeoPoint.getDouble("longitude");
         } catch (JSONException e) {

@@ -25,6 +25,7 @@ import com.vasyl.emergencyalert.utils.MyContactsManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class SmsSenderService extends Service implements LocationListener {
@@ -84,7 +85,7 @@ public class SmsSenderService extends Service implements LocationListener {
         double longitude = getLocation().getLongitude();
         LocationAddress location = new LocationAddress();
         location.getAddressFromLocation(latitude, longitude,
-                context, new GeocoderHandler());
+                context, new GeocoderHandler(this));
     }
 
     public void sendSMSMessage(String message) {
@@ -95,9 +96,9 @@ public class SmsSenderService extends Service implements LocationListener {
             for (String phoneNo : phones) {
                 smsManager.sendTextMessage(phoneNo, null, sms, null, null);
             }
-           Log.e("TEG", "SMS sent.");
+           Log.e("TAG", "SMS sent.");
         } catch (Exception e) {
-            Log.e("TEG","SMS failed, please try again.");
+            Log.e("TAG","SMS failed, please try again.");
             e.printStackTrace();
         }
     }
@@ -152,13 +153,21 @@ public class SmsSenderService extends Service implements LocationListener {
         return null;
     }
 
-    private class GeocoderHandler extends Handler {
+    private static final class GeocoderHandler extends Handler {
+
+        private final WeakReference<SmsSenderService> serviceWeakReference;
+
+        private GeocoderHandler(SmsSenderService serviceInstance) {
+            serviceWeakReference = new WeakReference<>(serviceInstance);
+        }
+
         @Override
         public void handleMessage(Message message) {
             Bundle bundle = message.getData();
             String addressString = bundle.getString("address");
-            sendSMSMessage(addressString);
-            sendPushNotification(addressString);
+            SmsSenderService targetService = serviceWeakReference.get();
+            targetService.sendSMSMessage(addressString);
+            targetService.sendPushNotification(addressString);
         }
     }
 }

@@ -37,7 +37,7 @@ public class SensorService extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         init();
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     private void init() {

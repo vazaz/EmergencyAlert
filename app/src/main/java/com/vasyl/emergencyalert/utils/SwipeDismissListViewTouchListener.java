@@ -22,18 +22,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
-    // Cached ViewConfiguration and system-wide constant values
     private int mSlop;
     private int mMinFlingVelocity;
     private int mMaxFlingVelocity;
     private long mAnimationTime;
 
-    // Fixed properties
     private ListView mListView;
     private DismissCallbacks mCallbacks;
-    private int mViewWidth = 1; // 1 and not 0 to prevent dividing by zero
+    private int mViewWidth = 1;
 
-    // Transient properties
     private List<PendingDismissData> mPendingDismisses = new ArrayList<PendingDismissData>();
     private int mDismissAnimationRefCount = 0;
     private float mDownX;
@@ -51,6 +48,7 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener {
 
         void onDismiss(ListView listView, int[] reverseSortedPositions);
     }
+
     public SwipeDismissListViewTouchListener(ListView listView, DismissCallbacks callbacks) {
         ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
         mSlop = vc.getScaledTouchSlop();

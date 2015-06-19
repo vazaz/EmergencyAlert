@@ -15,8 +15,8 @@ import java.util.Locale;
 public class LocationAddress {
     private static final String TAG = "LocationAddress";
 
-    public static void getAddressFromLocation(final double latitude, final double longitude,
-                                              final Context context, final Handler handler) {
+    public void getAddressFromLocation(final double latitude, final double longitude,
+                                       final Context context, final Handler handler) {
         Thread thread = new Thread() {
             @Override
             public void run() {
@@ -41,7 +41,7 @@ public class LocationAddress {
         thread.start();
     }
 
-    private static void setResultToHandleMessage(String result, Message message) {
+    private void setResultToHandleMessage(String result, Message message) {
         if (result != null) {
             message.what = 1;
             Bundle bundle = new Bundle();
@@ -56,7 +56,7 @@ public class LocationAddress {
         }
     }
 
-    private static String getAddressString(List<Address> addressList) {
+    private String getAddressString(List<Address> addressList) {
         Address address = addressList.get(0);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
