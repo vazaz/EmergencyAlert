@@ -45,11 +45,25 @@ public class ProfileFragment extends Fragment {
     }
 
     public void init() {
+        String nameString = getString(R.string.name);
+        String surnameString = getString(R.string.surname);
+        String diseaseString = getString(R.string.disease);
+
         sharedPrefs = getActivity().getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         nameEditText = (EditText) view.findViewById(R.id.name_edit_view);
         surnameEditText = (EditText) view.findViewById(R.id.surname_edit_view);
         diseaseEditText = (EditText) view.findViewById(R.id.disease);
+
+        setText(nameEditText, nameString);
+        setText(surnameEditText, surnameString);
+        setText(diseaseEditText, diseaseString);
+    }
+
+    private void setText(EditText editText, String string) {
+        if (sharedPrefs.contains(string)) {
+            editText.setText(sharedPrefs.getString(string, ""));
+        }
     }
 
     private void saveProfile() {

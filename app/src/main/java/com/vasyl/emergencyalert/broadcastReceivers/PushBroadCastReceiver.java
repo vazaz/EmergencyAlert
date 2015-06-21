@@ -15,11 +15,10 @@ import org.json.JSONObject;
 public class PushBroadCastReceiver extends ParsePushBroadcastReceiver {
     @Override
     protected void onPushOpen(Context context, Intent intent) {
-        JSONObject json;
         Double latitude = null;
         Double longitude = null;
         try {
-            json = new JSONObject(intent.getExtras().getString("com.parse.Data"));
+            JSONObject json = new JSONObject(intent.getExtras().getString("com.parse.Data"));
             JSONObject jsonGeoPoint = json.getJSONObject("location");
             latitude = jsonGeoPoint.getDouble("latitude");
             longitude = jsonGeoPoint.getDouble("longitude");

@@ -1,25 +1,11 @@
 <resources>
-    <string name="app_name">FallDetectionSMS</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">Fall-Alert</string>
     <string name="action_settings">Settings</string>
     <string name="enter_name">Name</string>
     <string name="enter_surname">Surname</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="heart_problems">Heart Disease</string>
-    <string name="epilepsy">Epilepsy</string>
-    <string name="parkinson">Parkinson\'s Disease</string>
-    <string name="alzheimer">Alzheimer\'s Disease</string>
-    <string name="other">Other</string>
-    <string name="helth_problems">Health Problems</string>
     <string name="profile">Profile</string>
     <string name="contacts">Contacts</string>
-    <string name="medicine">Medicine</string>
     <string name="add_contact">Click here and add contact</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="start_monitor">Start Monitoring</string>
     <string name="are_you_ok">Are You Ok?</string>
     <string name="i_am_ok">I\'m ok</string>
