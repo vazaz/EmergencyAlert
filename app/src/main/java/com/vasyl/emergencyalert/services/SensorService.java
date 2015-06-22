@@ -9,6 +9,7 @@ import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.vasyl.emergencyalert.views.FallDetectionDialogActivity;
 
@@ -21,32 +22,28 @@ public class SensorService extends Service implements SensorEventListener {
     private static final int BUFF_SIZE = 50;
     private static final String NONE = "none";
     private static final String FALL = "fall";
-    private static final String WALKING = "walking";
-    private static final String SITTING = "sitting";
-    private static final String STANDING = "standing";
+    private static final String FALLING = "falling";
 
     private String currentState;
     private String previousState;
-    private double[] window;
 
     private double currentX;
     private double currentY;
     private double currentZ;
+    private double prevX;
+    private double prevY;
+    private double prevZ;
     private Double linearAcceleration;
+    private Double prevLinearAcceleration;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         init();
-        return START_STICKY;
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void init() {
         SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-        window = new double[BUFF_SIZE];
-        for (int i = 0; i < BUFF_SIZE; i++) {
-            window[i] = 0;
-        }
         previousState = NONE;
         currentState = NONE;
 
@@ -68,17 +65,20 @@ public class SensorService extends Service implements SensorEventListener {
             currentX = event.values[0];
             currentY = event.values[1];
             currentZ = event.values[2];
-            posture_recognition(window, currentY);
+            posture_recognition(currentY);
             startFallDetectionAlertDialog(previousState);
             if (!previousState.equalsIgnoreCase(currentState)) {
                 previousState = currentState;
+                prevX = currentX;
+                prevY = currentY;
+                prevZ = currentZ;
             }
         }
     }
 
     private boolean iSFallDetected() {
         calculateLinearAcceleration();
-        if (linearAcceleration > 2) {
+        if (linearAcceleration > 1) {
             currentState = FALL;
         }
         return currentState == FALL;
@@ -86,37 +86,20 @@ public class SensorService extends Service implements SensorEventListener {
 
     private void calculateLinearAcceleration() {
         linearAcceleration = Math.sqrt(currentX * currentX + currentY * currentY + currentZ * currentZ);
+        prevLinearAcceleration = Math.sqrt(prevX * prevX + prevY * prevY + prevZ * prevZ);
     }
 
-    private void posture_recognition(double[] window2, double currentY) {
-        int zrc = compute_zrc(window2);
-        if (zrc == 0) {
-            staticPostureRecognition(currentY);
-        } else {
-            dynamicPostureRecognition(zrc);
+    private void posture_recognition(double currentY) {
+        int zrc = compute_zrc();
+        if (zrc == 0 & (Math.abs(currentY) < MIDDLE_THRESHOLD-1)) {
+            currentState = FALLING;
         }
     }
 
-    private void dynamicPostureRecognition(int zrc) {
-        if (zrc > LOW_THRESHOLD) {
-            currentState = WALKING;
-        } else {
-            currentState = NONE;
-        }
-    }
-
-    private void staticPostureRecognition(double currentY) {
-        if (Math.abs(currentY) < MIDDLE_THRESHOLD) {
-            currentState = SITTING;
-        } else {
-            currentState = STANDING;
-        }
-    }
-
-    private int compute_zrc(double[] window) {
+    private int compute_zrc() {
         int count = 0;
-        for (int i = 1; i <= BUFF_SIZE - 1; i++) {
-            if ((window[i] - HIGH_THRESHOLD) < SIGMA && (window[i - 1] - HIGH_THRESHOLD) > SIGMA) {
+        if (prevLinearAcceleration != null) {
+            if ((linearAcceleration - HIGH_THRESHOLD) < -LOW_THRESHOLD & (prevLinearAcceleration - HIGH_THRESHOLD) > SIGMA) {
                 count = count + 1;
             }
         }
@@ -124,8 +107,7 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     private void startFallDetectionAlertDialog(String previousState) {
-        if (iSFallDetected() & (previousState.equalsIgnoreCase(SITTING) ||
-                previousState.equalsIgnoreCase(STANDING))) {
+        if (iSFallDetected() & previousState.equalsIgnoreCase(FALLING)) {
             Intent intent = new Intent(this, FallDetectionDialogActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
