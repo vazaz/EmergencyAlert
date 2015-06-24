@@ -56,9 +56,9 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
         autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.add_contact);
         listView = (ListView) view.findViewById(R.id.listview);
         startButton = (Button) view.findViewById(R.id.start_button);
+        startButton.setEnabled(false);
 
         gson = new Gson();
-        startButton.setEnabled(false);
         List<Contact> allContactsList = myContactsManager.getAllContactsList(view);
         smsContactsList = getSmsContactsList();
         autoCompleteTextViewAdapter = getContactAdapter(allContactsList);
@@ -98,6 +98,9 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
                                     listAdapter.remove(position);
                                 }
                                 listAdapter.notifyDataSetChanged();
+                                if (listAdapter.isEmpty()) {
+                                    startButton.setEnabled(false);
+                                }
                             }
                         });
         listView.setOnTouchListener(touchListener);
@@ -137,9 +140,12 @@ public class ContactsFragment extends Fragment implements View.OnClickListener, 
 
     private List<Contact> getSmsContactsList() {
         if (myContactsManager.getSharedPrefs().contains(getString(R.string.contacts))) {
-            startButton.setEnabled(true);
+            if (!myContactsManager.getSmsContacts().isEmpty()) {
+                startButton.setEnabled(true);
+            }
             return myContactsManager.getSmsContacts();
         } else {
+            startButton.setEnabled(false);
             return new ArrayList<>();
         }
     }

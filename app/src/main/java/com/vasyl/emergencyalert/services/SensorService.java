@@ -17,9 +17,8 @@ public class SensorService extends Service implements SensorEventListener {
 
     private static final double SIGMA = 0.5;
     private static final double HIGH_THRESHOLD = 10;
-    private static final double MIDDLE_THRESHOLD = 5;
+    private static final double MIDDLE_THRESHOLD = 4;
     private static final double LOW_THRESHOLD = 2.5;
-    private static final int BUFF_SIZE = 50;
     private static final String NONE = "none";
     private static final String FALL = "fall";
     private static final String FALLING = "falling";
@@ -91,7 +90,7 @@ public class SensorService extends Service implements SensorEventListener {
 
     private void posture_recognition(double currentY) {
         int zrc = compute_zrc();
-        if (zrc == 0 & (Math.abs(currentY) < MIDDLE_THRESHOLD-1)) {
+        if (zrc == 0 & (Math.abs(currentY) < MIDDLE_THRESHOLD)) {
             currentState = FALLING;
         }
     }
@@ -99,7 +98,7 @@ public class SensorService extends Service implements SensorEventListener {
     private int compute_zrc() {
         int count = 0;
         if (prevLinearAcceleration != null) {
-            if ((linearAcceleration - HIGH_THRESHOLD) < -LOW_THRESHOLD & (prevLinearAcceleration - HIGH_THRESHOLD) > SIGMA) {
+            if (Math.abs(linearAcceleration - HIGH_THRESHOLD) < -LOW_THRESHOLD & (prevLinearAcceleration - HIGH_THRESHOLD) > SIGMA) {
                 count = count + 1;
             }
         }
