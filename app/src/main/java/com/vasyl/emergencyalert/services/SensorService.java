@@ -18,6 +18,7 @@ public class SensorService extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         init();
+        startFallDetectionAlertDialog(isFallDetected());
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -46,7 +47,8 @@ public class SensorService extends Service implements SensorEventListener {
     }
     
     private boolean isFallDetected() {
-//      Fall detection algorithm must implement here 
+//      Fall detection algorithm must implement here
+        return true;
     }
 
     @Override
